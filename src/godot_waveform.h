@@ -6,15 +6,16 @@
 
 using namespace godot;
 
-class ExampleClass : public RefCounted {
-	GDCLASS(ExampleClass, RefCounted)
+class GodotWaveform : public RefCounted {
+	GDCLASS(GodotWaveform, RefCounted)
 
 protected:
 	static void _bind_methods();
 
 public:
-	ExampleClass() = default;
-	~ExampleClass() override = default;
+	GodotWaveform() = default;
+	~GodotWaveform() override = default;
 
 	void print_type(const Variant &p_variant) const;
 };
+

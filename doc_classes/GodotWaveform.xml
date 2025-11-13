@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="ExampleClass" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+<class name="GodotWaveform" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
-		Example class.
+		Waveform class.
 	</brief_description>
 	<description>
-		An example class.
+		A waveform class.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -18,3 +18,4 @@
 		</method>
 	</methods>
 </class>
+
