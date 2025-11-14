@@ -1,52 +1,129 @@
-# godot-cpp template
-This repository serves as a quickstart template for GDExtension development with Godot 4.0+.
+# Godot Waveform Plugin
 
-## Contents
-* Preconfigured source files for C++ development of the GDExtension ([src/](./src/))
-* An empty Godot project in [demo/](./demo), to test the GDExtension
-* godot-cpp as a submodule (`godot-cpp/`)
-* GitHub Issues template ([.github/ISSUE_TEMPLATE.yml](./.github/ISSUE_TEMPLATE.yml))
-* GitHub CI/CD workflows to publish your library packages when creating a release ([.github/workflows/builds.yml](./.github/workflows/builds.yml))
-* An SConstruct file with various functions, such as boilerplate for [Adding documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/cpp/gdextension_docs_system.html)
+A GDExtension plugin for Godot 4.1+ that generates waveform data from audio streams. The plugin provides a singleton utility to extract min/max amplitude pairs from audio streams, which can be used to visualize waveforms.
 
-## Usage - Template
+## Features
 
-To use this template, log in to GitHub and click the green "Use this template" button at the top of the repository page. This will let you create a copy of this repository with a clean git history.
+- Generate waveform data from any `AudioStream` that supports playback
+- Configurable sampling frequency for waveform resolution
+- Returns `PackedVector2Array` with min/max pairs for each time window
+- Cross-platform support (macOS, Windows, Linux, Android, iOS, Web)
 
-To get started with your new GDExtension, do the following:
+## Building
 
-* clone your repository to your local computer
-* initialize the godot-cpp git submodule via `git submodule update --init`
-* change the name of the compiled library file inside the [SConstruct](./SConstruct) file by modifying the `libname` string.
-  * change the paths of the to be loaded library name inside the [demo/bin/example.gdextension](./demo/bin/example.gdextension) file, by replacing `EXTENSION-NAME` with the name you chose for `libname`.
-* change the `entry_symbol` string inside [demo/bin/example.gdextension](./demo/bin/example.gdextension) file.
-  * rename the `example_library_init` function in [src/register_types.cpp](./src/register_types.cpp) to the same name you chose for `entry_symbol`.
-* change the name of the `demo/bin/example.gdextension` file
+### Prerequisites
 
-Now, you can build the project with the following command:
+- Python 3.x
+- SCons build system
+- C++ compiler (Clang, GCC, or MSVC depending on platform)
+- Godot 4.1 or later
 
+### Build Steps
+
+1. Clone the repository and initialize submodules:
+```shell
+git clone <repository-url>
+cd godot-waveform-plugin
+git submodule update --init --recursive
+```
+
+2. Build the plugin:
 ```shell
 scons
 ```
 
-If the build command worked, you can test it with the [demo](./demo) project. Import it into Godot, open it, and launch the main scene. You should see it print the following line in the console:
+The compiled library will be placed in `bin/<platform>/` and automatically copied to `demo/bin/<platform>/`.
 
-```
-Type: 24
-```
+### Build Options
 
-### Configuring an IDE
-You can develop your own extension with any text editor and by invoking scons on the command line, but if you want to work with an IDE (Integrated Development Environment), you can use a compilation database file called `compile_commands.json`. Most IDEs should automatically identify this file, and self-configure appropriately.
-To generate the database file, you can run one of the following commands in the project root directory:
+- Generate compile commands for IDE support:
 ```shell
-# Generate compile_commands.json while compiling
 scons compiledb=yes
-
-# Generate compile_commands.json without compiling
-scons compiledb=yes compile_commands.json
 ```
 
-## Usage - Actions
+- Build for specific platform (see SConstruct for available platforms)
 
-This repository comes with a GitHub action that builds the GDExtension for cross-platform use. It triggers automatically for each pushed change. You can find and edit it in [builds.yml](.github/workflows/builds.yml).
-After a workflow run is complete, you can find the file `godot-cpp-template.zip` on the `Actions` tab on GitHub.
+## Installation
+
+1. Copy the `.gdextension` file and library files to your Godot project:
+   - Copy `demo/bin/example.gdextension` to your project (rename as needed)
+   - Copy the appropriate library file from `demo/bin/<platform>/` to match the `.gdextension` file location
+
+2. Update the library paths in the `.gdextension` file if you place it in a different location
+
+3. The plugin will be automatically loaded when you open your project in Godot
+
+## Usage
+
+The `Waveform` class is available as a singleton. Use it to generate waveform data from audio streams:
+
+```gdscript
+# Get the Waveform singleton
+var waveform = Waveform.get_singleton()
+
+# Generate waveform data from an AudioStream
+# sampling_frequency: how many samples per second (e.g., 60 Hz = 60 samples per second)
+var audio_stream = preload("res://path/to/your/audio.ogg")
+var result = waveform.generate(audio_stream, 60.0)
+
+# result is a PackedVector2Array where each element is Vector2(min, max)
+# representing the minimum and maximum amplitude for that time window
+```
+
+### Example: Visualizing a Waveform
+
+```gdscript
+extends TextureRect
+
+@export var audio_stream: AudioStream
+
+func _ready() -> void:
+    var waveform = Waveform.get_singleton()
+    var result = waveform.generate(audio_stream, 60.0)
+
+    if result.is_empty():
+        return
+
+    # Create image from waveform data
+    var width = result.size()
+    var height = 256
+    var image = Image.create(width, height, false, Image.FORMAT_RGB8)
+    image.fill(Color.BLACK)
+
+    # Draw waveform
+    for i in range(result.size()):
+        var min_max = result[i]
+        var min_val = min_max.x
+        var max_val = min_max.y
+
+        # Convert from [-1, 1] range to [0, height-1] range
+        var min_y = clamp(int((1.0 + min_val) * 0.5 * height), 0, height - 1)
+        var max_y = clamp(int((1.0 + max_val) * 0.5 * height), 0, height - 1)
+
+        # Ensure min_y <= max_y
+        if min_y > max_y:
+            var temp = min_y
+            min_y = max_y
+            max_y = temp
+
+        # Draw line from min to max
+        for y in range(min_y, max_y + 1):
+            image.set_pixel(i, y, Color.WHITE)
+
+    # Create texture from image
+    self.texture = ImageTexture.create_from_image(image)
+```
+
+### API Reference
+
+#### `generate(stream: AudioStream, sampling_frequency: float) -> PackedVector2Array`
+
+Generates min/max waveform pairs for the given `AudioStream` at the specified sampling frequency.
+
+- **stream**: The audio stream to analyze (must support playback, e.g., `AudioStreamOggVorbis`)
+- **sampling_frequency**: Samples per second (e.g., `60.0` for 60 samples per second)
+- **Returns**: `PackedVector2Array` where each element is `Vector2(min, max)` representing the amplitude range for that time window
+
+## License
+
+MIT License - see [LICENSE.md](LICENSE.md) for details.
