@@ -64,7 +64,7 @@ var waveform = Waveform.get_singleton()
 # Generate waveform data from an AudioStream
 # sampling_frequency: how many samples per second (e.g., 60 Hz = 60 samples per second)
 var audio_stream = preload("res://path/to/your/audio.ogg")
-var result = waveform.generate(audio_stream, 60.0)
+var result = waveform.minmax(audio_stream, 60.0)
 
 # result is a PackedVector2Array where each element is Vector2(min, max)
 # representing the minimum and maximum amplitude for that time window
@@ -79,7 +79,7 @@ extends TextureRect
 
 func _ready() -> void:
     var waveform = Waveform.get_singleton()
-    var result = waveform.generate(audio_stream, 60.0)
+    var result = waveform.minmax(audio_stream, 60.0)
 
     if result.is_empty():
         return
@@ -116,13 +116,21 @@ func _ready() -> void:
 
 ### API Reference
 
-#### `generate(stream: AudioStream, sampling_frequency: float) -> PackedVector2Array`
+#### `minmax(stream: AudioStream, sampling_frequency: float) -> PackedVector2Array`
 
 Generates min/max waveform pairs for the given `AudioStream` at the specified sampling frequency.
 
 - **stream**: The audio stream to analyze (must support playback, e.g., `AudioStreamOggVorbis`)
 - **sampling_frequency**: Samples per second (e.g., `60.0` for 60 samples per second)
 - **Returns**: `PackedVector2Array` where each element is `Vector2(min, max)` representing the amplitude range for that time window
+
+#### `magnitude(stream: AudioStream, sampling_frequency: float) -> PackedFloat32Array`
+
+Generates magnitude values for the given `AudioStream` at the specified sampling frequency.
+
+- **stream**: The audio stream to analyze (must support playback, e.g., `AudioStreamOggVorbis`)
+- **sampling_frequency**: Samples per second (e.g., `60.0` for 60 samples per second)
+- **Returns**: `PackedFloat32Array` where each element is `max(abs(min), abs(max))` for each time window
 
 ## License
 

@@ -5,6 +5,7 @@
 #include <godot_cpp/classes/audio_stream_playback.hpp>
 #include <godot_cpp/classes/audio_server.hpp>
 #include <godot_cpp/variant/packed_vector2_array.hpp>
+#include <godot_cpp/variant/packed_float32_array.hpp>
 #include <godot_cpp/variant/variant.hpp>
 
 using namespace godot;
@@ -22,6 +23,7 @@ public:
 	static Waveform *get_singleton();
 	static Waveform *singleton;
 
-	PackedVector2Array generate(const Ref<AudioStream> &p_stream, float p_sampling_frequency) const;
+	PackedVector2Array minmax(const Ref<AudioStream> &p_stream, float p_sampling_frequency) const;
+	PackedFloat32Array magnitude(const Ref<AudioStream> &p_stream, float p_sampling_frequency) const;
 };
 

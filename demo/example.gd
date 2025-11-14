@@ -5,7 +5,7 @@ extends TextureRect
 
 func _ready() -> void:
 	var waveform = Waveform.new()
-	var result = waveform.generate(audio_stream, 60)
+	var result = waveform.minmax(audio_stream, 60)
 	print("samples=", result.size())
 
 	if result.is_empty():

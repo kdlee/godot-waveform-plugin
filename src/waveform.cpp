@@ -1,18 +1,20 @@
 #include "waveform.h"
 
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/core/math.hpp>
 
 Waveform *Waveform::singleton = nullptr;
 
 void Waveform::_bind_methods() {
-	godot::ClassDB::bind_method(D_METHOD("generate", "stream", "sampling_frequency"), &Waveform::generate);
+	godot::ClassDB::bind_method(D_METHOD("minmax", "stream", "sampling_frequency"), &Waveform::minmax);
+	godot::ClassDB::bind_method(D_METHOD("magnitude", "stream", "sampling_frequency"), &Waveform::magnitude);
 }
 
 Waveform *Waveform::get_singleton() {
 	return singleton;
 }
 
-PackedVector2Array Waveform::generate(const Ref<AudioStream> &p_stream, float p_sampling_frequency) const {
+PackedVector2Array Waveform::minmax(const Ref<AudioStream> &p_stream, float p_sampling_frequency) const {
 	PackedVector2Array min_max_pairs;
 
 	if (p_stream.is_null()) {
@@ -72,5 +74,25 @@ PackedVector2Array Waveform::generate(const Ref<AudioStream> &p_stream, float p_
 
 	playback->stop();
 	return min_max_pairs;
+}
+
+PackedFloat32Array Waveform::magnitude(const Ref<AudioStream> &p_stream, float p_sampling_frequency) const {
+	PackedFloat32Array magnitudes;
+	PackedVector2Array min_max_pairs = minmax(p_stream, p_sampling_frequency);
+
+	const int64_t num_pairs = min_max_pairs.size();
+	magnitudes.resize(num_pairs);
+
+	const Vector2 *pairs_ptr = min_max_pairs.ptr();
+	float *magnitudes_ptr = magnitudes.ptrw();
+
+	for (int64_t i = 0; i < num_pairs; i++) {
+		const Vector2 &pair = pairs_ptr[i];
+		const float abs_min = Math::abs(pair.x);
+		const float abs_max = Math::abs(pair.y);
+		magnitudes_ptr[i] = Math::max(abs_min, abs_max);
+	}
+
+	return magnitudes;
 }
 
