@@ -9,17 +9,30 @@
 
 using namespace godot;
 
+static GodotWaveform *godot_waveform_singleton = nullptr;
+
 void initialize_gdextension_types(ModuleInitializationLevel p_level)
 {
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
 		return;
 	}
 	GDREGISTER_CLASS(GodotWaveform);
+	// Create and register singleton instance.
+	godot_waveform_singleton = memnew(GodotWaveform);
+	GodotWaveform::singleton = godot_waveform_singleton;
+	ClassDB::_register_engine_singleton(GodotWaveform::get_class_static(), godot_waveform_singleton);
 }
 
 void uninitialize_gdextension_types(ModuleInitializationLevel p_level) {
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
 		return;
+	}
+	// Unregister and free singleton instance.
+	if (godot_waveform_singleton) {
+		ClassDB::_unregister_engine_singleton(GodotWaveform::get_class_static());
+		memdelete(godot_waveform_singleton);
+		godot_waveform_singleton = nullptr;
+		GodotWaveform::singleton = nullptr;
 	}
 }
 
