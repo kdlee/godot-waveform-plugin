@@ -5,7 +5,7 @@ import sys
 from methods import print_error
 
 
-libname = "GodotWaveform"
+libname = "Waveform"
 projectdir = "demo"
 
 localEnv = Environment(tools=["default"], PLATFORM="")

@@ -1,18 +1,18 @@
-#include "godot_waveform.h"
+#include "waveform.h"
 
 #include <godot_cpp/core/class_db.hpp>
 
-GodotWaveform *GodotWaveform::singleton = nullptr;
+Waveform *Waveform::singleton = nullptr;
 
-void GodotWaveform::_bind_methods() {
-	godot::ClassDB::bind_method(D_METHOD("generate", "stream", "sampling_frequency"), &GodotWaveform::generate);
+void Waveform::_bind_methods() {
+	godot::ClassDB::bind_method(D_METHOD("generate", "stream", "sampling_frequency"), &Waveform::generate);
 }
 
-GodotWaveform *GodotWaveform::get_singleton() {
+Waveform *Waveform::get_singleton() {
 	return singleton;
 }
 
-PackedVector2Array GodotWaveform::generate(const Ref<AudioStream> &p_stream, float p_sampling_frequency) const {
+PackedVector2Array Waveform::generate(const Ref<AudioStream> &p_stream, float p_sampling_frequency) const {
 	PackedVector2Array min_max_pairs;
 
 	if (p_stream.is_null()) {

@@ -9,18 +9,18 @@
 
 using namespace godot;
 
-class GodotWaveform : public Node {
-	GDCLASS(GodotWaveform, Node)
+class Waveform : public Node {
+	GDCLASS(Waveform, Node)
 
 protected:
 	static void _bind_methods();
 
 public:
-	GodotWaveform() = default;
-	~GodotWaveform() override = default;
+	Waveform() = default;
+	~Waveform() override = default;
 
-	static GodotWaveform *get_singleton();
-	static GodotWaveform *singleton;
+	static Waveform *get_singleton();
+	static Waveform *singleton;
 
 	PackedVector2Array generate(const Ref<AudioStream> &p_stream, float p_sampling_frequency) const;
 };

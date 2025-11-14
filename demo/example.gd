@@ -4,8 +4,9 @@ extends TextureRect
 
 
 func _ready() -> void:
-	var waveform = GodotWaveform.new()
+	var waveform = Waveform.new()
 	var result = waveform.generate(audio_stream, 60)
+	print("samples=", result.size())
 
 	if result.is_empty():
 		return
