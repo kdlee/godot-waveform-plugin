@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="Waveform" inherits="Node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Waveform utility singleton.
+	</brief_description>
+	<description>
+		A singleton utility for generating min/max pairs for drawing audio waveforms.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="minmax" qualifiers="const">
+			<return type="PackedVector2Array" />
+			<param index="0" name="stream" type="AudioStream" />
+			<param index="1" name="sampling_frequency" type="float" />
+			<description>
+				Generates min/max waveform pairs for the given AudioStream at the specified sampling frequency (e.g. 60 Hz).
+				Only AudioStream types that can be instantiated into playback (e.g. AudioStreamOggVorbis) are supported.
+				The returned array contains Vector2(min, max) for each time window.
+			</description>
+		</method>
+		<method name="magnitude" qualifiers="const">
+			<return type="PackedFloat32Array" />
+			<param index="0" name="stream" type="AudioStream" />
+			<param index="1" name="sampling_frequency" type="float" />
+			<description>
+				Generates magnitude values for the given AudioStream at the specified sampling frequency (e.g. 60 Hz).
+				Only AudioStream types that can be instantiated into playback (e.g. AudioStreamOggVorbis) are supported.
+				The returned array contains max(abs(min), abs(max)) for each time window.
+			</description>
+		</method>
+	</methods>
+</class>
+
